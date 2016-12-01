@@ -5,31 +5,56 @@ import React, { Component } from 'react';
 import reactMixin from 'react-mixin'
 import './BeleafsRoot.css';
 
-
 type Vertice = {
   '.key': string,
   text: string,
+  children: ?Array<Vertice>,
 };
 
 class Beleafs extends Component {
 
   props: {
+    addItem: Function,
     removeItem: Function,
     vertices: Array<Vertice>,
   };
 
+  state: {
+    text: string,
+  };
+  constructor(props) {
+    super();
+    this.state = {
+      text: ''
+    }
+  }
+
+  onAddItemClicked(e) {
+    e.preventDefault(); 
+    this.props.addItem(this.state.text); 
+    this.setState({text: ''});
+  }
+
   render() {
-    var createItem = (vertice, index) => {
-      return (
+    return (
+      <ul>
+        {this.props.vertices.map((vertice, index) => 
         <li key={ index }>
-          { vertice.text }
-          <span className="delete" onClick={ this.props.removeItem.bind(null, vertice['.key']) }>
-            X
-          </span>
+            { vertice.text }
+            <span className="delete" onClick={ this.props.removeItem.bind(null, vertice['.key']) }>
+              X
+            </span>
+            {vertice.children && <Beleafs vertices={vertice.children} addItem={this.props.addItem} removeItem={this.props.removeItem} />}
+            
         </li>
-      );
-    };
-    return <ul>{ this.props.vertices.map(createItem) }</ul>;
+        )
+      }
+      <form onSubmit={this.onAddItemClicked.bind(this)}>
+        <input onChange={(e)=>this.setState({text: e.target.value})} value={ this.state.text } />
+        <button>{ `I Beleaf it! (#${this.props.vertices.length + 1})`}</button>
+      </form>
+      </ul>
+    );
   }
 }
 
@@ -39,14 +64,12 @@ class BeleafsRoot extends Component {
   firebaseRefs: Object;
   state: {
     vertices: Array<Vertice>,
-    text: string,
   };
 
   constructor() {
     super();
     this.state = {
       vertices: [], 
-      text: ''
     }
   }
 
@@ -55,8 +78,11 @@ class BeleafsRoot extends Component {
     this.bindAsArray(firebaseRef.limitToLast(25), 'vertices');
   }
 
-  onChange(e: Object) {
-    this.setState({text: e.target.value});
+  addItem(text: string) {
+    if(text && text.length > 0)
+      this.firebaseRefs['vertices'].push({
+        text: text
+      });
   }
 
   removeItem(key: string) {
@@ -64,26 +90,10 @@ class BeleafsRoot extends Component {
     firebaseRef.child(key).remove();
   }
 
-  handleSubmit(e: Object) {
-    e.preventDefault();
-    if (this.state.text && this.state.text.trim().length !== 0) {
-      this.firebaseRefs['vertices'].push({
-        text: this.state.text
-      });
-      this.setState({
-        text: ''
-      });
-    }
-  }
-
   render() {
     return (
       <div className="beleafsRoot">
-        <Beleafs vertices={ this.state.vertices } removeItem={ this.removeItem } />
-        <form onSubmit={ this.handleSubmit.bind(this) }>
-          <input onChange={ this.onChange.bind(this) } value={ this.state.text } />
-          <button>{ `I Beleaf it! (#${this.state.vertices.length + 1})`}</button>
-        </form>
+        <Beleafs vertices={ this.state.vertices } addItem={this.addItem.bind(this)} removeItem={ this.removeItem.bind(this) } />
       </div>
     );
   }
