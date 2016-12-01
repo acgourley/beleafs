@@ -1,0 +1,9 @@
+.beleafsRoot {
+  margin: 10px;
+}
+
+.delete {
+  color: red;
+  margin-left: 10px;
+  cursor: pointer;
+}

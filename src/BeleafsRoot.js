@@ -3,17 +3,27 @@ import firebase from 'firebase';
 import ReactFireMixin from 'reactfire';
 import React, { Component } from 'react';
 import reactMixin from 'react-mixin'
+import './BeleafsRoot.css';
+
+
+type Vertice = {
+  '.key': string,
+  text: string,
+};
 
 class Beleafs extends Component {
 
+  props: {
+    removeItem: Function,
+    vertices: Array<Vertice>,
+  };
+
   render() {
-    var _this = this;
-    var createItem = function(vertice, index) {
+    var createItem = (vertice, index) => {
       return (
         <li key={ index }>
           { vertice.text }
-          <span onClick={ _this.props.removeItem.bind(null, vertice['.key']) }
-                style={{ color: 'red', marginLeft: '10px', cursor: 'pointer' }}>
+          <span className="delete" onClick={ this.props.removeItem.bind(null, vertice['.key']) }>
             X
           </span>
         </li>
@@ -23,17 +33,21 @@ class Beleafs extends Component {
   }
 }
 
-class ReactFireMixinComponent extends Component {
+
+class BeleafsRoot extends Component {
   bindAsArray: Function;
   firebaseRefs: Object;
-  state: Object;
-}
+  state: {
+    vertices: Array<Vertice>,
+    text: string,
+  };
 
-class BeleafsRoot extends ReactFireMixinComponent{
-
-  state = {
-    vertices: [], 
-    text: ''
+  constructor() {
+    super();
+    this.state = {
+      vertices: [], 
+      text: ''
+    }
   }
 
   componentWillMount() {
@@ -64,7 +78,7 @@ class BeleafsRoot extends ReactFireMixinComponent{
 
   render() {
     return (
-      <div>
+      <div className="beleafsRoot">
         <Beleafs vertices={ this.state.vertices } removeItem={ this.removeItem } />
         <form onSubmit={ this.handleSubmit.bind(this) }>
           <input onChange={ this.onChange.bind(this) } value={ this.state.text } />

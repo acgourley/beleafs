@@ -14,6 +14,7 @@ npm start
 Authenticating with firebase should only need to happen once.
 ```
 firebase login 
+firebase use beleafs-6f378
 npm run build
 firebase deploy
 ```
