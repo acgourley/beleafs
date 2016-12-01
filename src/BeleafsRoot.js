@@ -4,11 +4,12 @@ import ReactFireMixin from 'reactfire';
 import React, { Component } from 'react';
 import reactMixin from 'react-mixin'
 import './BeleafsRoot.css';
+import _ from 'lodash';
 
-type Vertice = {
+type TreeVertice = {
   '.key': string,
   text: string,
-  children: ?Array<Vertice>,
+  children: ?Array<TreeVertice>,
 };
 
 class Beleafs extends Component {
@@ -16,7 +17,7 @@ class Beleafs extends Component {
   props: {
     addItem: Function,
     removeItem: Function,
-    vertices: Array<Vertice>,
+    treeVertices: Array<TreeVertice>,
   };
 
   state: {
@@ -38,20 +39,22 @@ class Beleafs extends Component {
   render() {
     return (
       <ul>
-        {this.props.vertices.map((vertice, index) => 
+        {this.props.treeVertices.map((treeVertice, index) => 
         <li key={ index }>
-            { vertice.text }
-            <span className="delete" onClick={ this.props.removeItem.bind(null, vertice['.key']) }>
+            { treeVertice.text }
+            <span className="delete" onClick={ this.props.removeItem.bind(null, treeVertice['.key']) }>
               X
             </span>
-            {vertice.children && <Beleafs vertices={vertice.children} addItem={this.props.addItem} removeItem={this.props.removeItem} />}
+            {treeVertice.children && treeVertice.children.length > 0 && 
+              <Beleafs treeVertices={treeVertice.children} addItem={this.props.addItem} removeItem={this.props.removeItem} />
+            }
             
         </li>
         )
       }
       <form onSubmit={this.onAddItemClicked.bind(this)}>
         <input onChange={(e)=>this.setState({text: e.target.value})} value={ this.state.text } />
-        <button>{ `I Beleaf it! (#${this.props.vertices.length + 1})`}</button>
+        <button>{ `I Beleaf it! (#${this.props.treeVertices.length + 1})`}</button>
       </form>
       </ul>
     );
@@ -61,21 +64,25 @@ class Beleafs extends Component {
 
 class BeleafsRoot extends Component {
   bindAsArray: Function;
+  bindAsObject: Function;
   firebaseRefs: Object;
+
   state: {
-    vertices: Array<Vertice>,
+    vertices: {},
+    edges: {},
   };
 
   constructor() {
     super();
     this.state = {
-      vertices: [], 
+      vertices: {}, 
+      edges: {}, 
     }
   }
 
   componentWillMount() {
-    var firebaseRef = firebase.database().ref('beleafs/vertices');
-    this.bindAsArray(firebaseRef.limitToLast(25), 'vertices');
+    this.bindAsObject(firebase.database().ref('beleafs/vertices'), 'vertices');
+    this.bindAsObject(firebase.database().ref('beleafs/edges'), 'edges');
   }
 
   addItem(text: string) {
@@ -90,10 +97,26 @@ class BeleafsRoot extends Component {
     firebaseRef.child(key).remove();
   }
 
+  //just flatten into a single array, for now. In the near future we should turn a list of edges and vertices into a graph structure
+  treeFromData(vertices, edges) : Array<TreeVertice> {
+    const allVertices = _.filter(_.map(this.state.vertices, (v, k) => {
+      if(k !== '.key')
+        return {
+          '.key': k, 
+          text: v.text,
+          children: []
+        }
+    }), (v) => v);
+    return allVertices;
+  }
+
   render() {
+    console.dir(this.state)
+    const treeData = this.treeFromData(this.state.vertices, this.state.edges);
+    console.dir(treeData)
     return (
       <div className="beleafsRoot">
-        <Beleafs vertices={ this.state.vertices } addItem={this.addItem.bind(this)} removeItem={ this.removeItem.bind(this) } />
+        <Beleafs treeVertices={treeData} addItem={this.addItem.bind(this)} removeItem={ this.removeItem.bind(this) } />
       </div>
     );
   }
