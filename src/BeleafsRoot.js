@@ -6,117 +6,199 @@ import reactMixin from 'react-mixin'
 import './BeleafsRoot.css';
 import _ from 'lodash';
 
-type TreeVertice = {
-  '.key': string,
-  text: string,
-  children: ?Array<TreeVertice>,
+/* 
+
+Firebase Schema 
+
+  spans: {
+    {0: {
+      title: "...",
+      rootVerticeKey: 0,
+      vertices: {
+        0: {
+          statement: "...",
+          description: "...",
+          children: [1, 2, ...]
+        },
+        ...
+      },
+    },
+    ...
+  }
+
+*/
+
+/* Flow Types */
+
+type FBVertice = {
+  '.key': ?string,
+  statement: string,
+  description: string,
+  childrenKeys: ?{[key: string] : string}
 };
 
-class Beleafs extends Component {
+type FBSpan = {
+  '.key': string,
+  title: string,
+  rootVerticeKey: string,
+  vertices: {[key: string] : FBVertice}
+};
 
+class VerticeComponent extends Component {
+  /* Flow Types */
   props: {
-    addItem: Function,
-    removeItem: Function,
-    treeVertices: Array<TreeVertice>,
+    addVertice: Function,
+    removeVertice: Function,
+    vertice: FBVertice,
+    parent: ?FBVertice,
+    span: FBSpan,
+    verticeKey: string,
+    parentKey: ?string,
   };
 
   state: {
-    text: string,
+    newChildText: string;
   };
+
+  onAddClicked(e) {
+    e.preventDefault(); 
+    this.props.addVertice({
+      statement: this.state.newChildText,
+      description: '',
+      children: {},
+    }, this.props.verticeKey); 
+    this.setState({newChildText: ''});
+  }
+
   constructor(props) {
     super();
     this.state = {
-      text: ''
+      newChildText: '',
     }
   }
 
-  onAddItemClicked(e) {
-    e.preventDefault(); 
-    this.props.addItem(this.state.text); 
-    this.setState({text: ''});
+  render() {
+    const {addVertice, removeVertice, vertice, span, verticeKey, parentKey} = this.props;
+    const {newChildText} = this.state;
+    console.log('DEBUG: inside VerticeComponent with props: ', this.props)
+    return (
+      <div>
+        <span>{vertice.statement + ' ' + vertice.description}</span>
+        {parentKey && !_.keys(vertice.childrenKeys).length && 
+          <span className="delete" onClick={ removeVertice.bind(null, verticeKey, parentKey) }>
+            DELETE
+          </span>
+        }
+
+        <ul>
+          {<li>
+            <form onSubmit={this.onAddClicked.bind(this)}>
+              <input onChange={(e)=>this.setState({newChildText: e.target.value})} value={ newChildText } />
+              <button>{ `I Beleaf it!`}</button>
+            </form>
+          </li>
+          }
+          {_.map(vertice.childrenKeys, (childVerticeKey: string) => 
+            <li key={childVerticeKey}>
+              {span.vertices[childVerticeKey] && <VerticeComponent parentKey={verticeKey} verticeKey={childVerticeKey} span={span} vertice={span.vertices[childVerticeKey]} addVertice={addVertice} removeVertice={removeVertice}/>        }
+            </li>
+          )}
+        </ul>
+      </div>
+    );
+  }
+}
+
+class SpanComponent extends Component {
+
+  /* Flow Types */
+  props: {
+    addVertice: Function,
+    removeVertice: Function,
+    span: FBSpan,
+  };
+
+  state: {
+  };
+
+  constructor(props) {
+    super();
+    this.state = {
+    }
   }
 
   render() {
+    const {addVertice, removeVertice, span} = this.props;
+    console.log('SpanComponent is in render() with props:', this.props)
+
     return (
-      <ul>
-        {this.props.treeVertices.map((treeVertice, index) => 
-        <li key={ index }>
-            { treeVertice.text }
-            <span className="delete" onClick={ this.props.removeItem.bind(null, treeVertice['.key']) }>
-              X
-            </span>
-            {treeVertice.children && treeVertice.children.length > 0 && 
-              <Beleafs treeVertices={treeVertice.children} addItem={this.props.addItem} removeItem={this.props.removeItem} />
-            }
-            
-        </li>
-        )
-      }
-      <form onSubmit={this.onAddItemClicked.bind(this)}>
-        <input onChange={(e)=>this.setState({text: e.target.value})} value={ this.state.text } />
-        <button>{ `I Beleaf it! (#${this.props.treeVertices.length + 1})`}</button>
-      </form>
-      </ul>
+      <div>
+        <h3>{span.title}</h3>
+        <VerticeComponent parentKey={null} verticeKey={span.rootVerticeKey} span={span} vertice={span.vertices[span.rootVerticeKey]} addVertice={addVertice} removeVertice={removeVertice}/>
+      </div>
     );
   }
 }
 
 
 class BeleafsRoot extends Component {
+
+  /* Flow Types (top ones for ReactFireMixin) */
   bindAsArray: Function;
   bindAsObject: Function;
   firebaseRefs: Object;
-
   state: {
-    vertices: {},
-    edges: {},
+    spans: {[key: string]: FBSpan},
   };
 
   constructor() {
     super();
     this.state = {
-      vertices: {}, 
-      edges: {}, 
+      spans: {}
     }
   }
 
   componentWillMount() {
-    this.bindAsObject(firebase.database().ref('beleafs/vertices'), 'vertices');
-    this.bindAsObject(firebase.database().ref('beleafs/edges'), 'edges');
+    this.bindAsObject(firebase.database().ref('beleafs/spans'), 'spans');
   }
 
-  addItem(text: string) {
-    if(text && text.length > 0)
-      this.firebaseRefs['vertices'].push({
-        text: text
-      });
+  addVertice(spanKey: string, vertice: FBVertice, parentVerticeKey: string) {
+      const verticeToSave: FBVertice = {
+        statement: vertice.statement,
+        description: vertice.description,
+        childrenKeys: {},
+      }
+      const savedVertice = firebase.database().ref(`beleafs/spans/${spanKey}/vertices`).push(verticeToSave);
+      console.log('DEBUG: savedVertice.key is:', savedVertice.key);
+      const parentVertice = firebase.database().ref(`beleafs/spans/${spanKey}/vertices/${parentVerticeKey}/childrenKeys`);
+      const savedChildKey = parentVertice.push(savedVertice.key);
+      console.log('DEBUG: savedChildKey is:', savedChildKey);
+
   }
 
-  removeItem(key: string) {
-    var firebaseRef = firebase.database().ref('beleafs/vertices');
-    firebaseRef.child(key).remove();
-  }
-
-  //just flatten into a single array, for now. In the near future we should turn a list of edges and vertices into a graph structure
-  treeFromData(vertices, edges) : Array<TreeVertice> {
-    const allVertices = _.filter(_.map(this.state.vertices, (v, k) => {
-      if(k !== '.key')
-        return {
-          '.key': k, 
-          text: v.text,
-          children: []
-        }
-    }), (v) => v);
-    return allVertices;
+  removeVertice(spanKey: string, verticeKey: string, parentVerticeKey: string) {
+    //var firebaseRef = firebase.database().ref('beleafs/spans');
+    //firebaseRef.child(key).remove();
+    this.firebaseRefs.spans.child(spanKey).child('vertices').child(verticeKey).remove();
+    const childrenKeys = this.firebaseRefs.spans.child(spanKey).child('vertices').child(parentVerticeKey).child('childrenKeys')
+    childrenKeys.orderByValue().equalTo(verticeKey).on("value", function(snapshot) {
+      console.log('snapshot:', snapshot)
+      snapshot.forEach((data) => {
+        console.log('data:', data);
+        childrenKeys.child(data.key).remove();
+      })
+    });
   }
 
   render() {
-    console.dir(this.state)
-    const treeData = this.treeFromData(this.state.vertices, this.state.edges);
-    console.dir(treeData)
+    console.log('BeleafsRoot is in render() with state:', this.state)
     return (
       <div className="beleafsRoot">
-        <Beleafs treeVertices={treeData} addItem={this.addItem.bind(this)} removeItem={ this.removeItem.bind(this) } />
+        {_.map(this.state.spans, (span: FBSpan, spanKey: string) => 
+          spanKey !== '.key' && <SpanComponent key={spanKey} span={span} 
+            addVertice={(vertice, parentVerticeKey)=>this.addVertice(spanKey, vertice, parentVerticeKey)} 
+            removeVertice={(verticeKey, parentVerticeKey)=>this.removeVertice(spanKey, verticeKey, parentVerticeKey)} />
+        )}
       </div>
     );
   }
