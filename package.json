@@ -10,6 +10,9 @@
     "lodash": "^4.17.2",
     "react": "^15.4.1",
     "react-dom": "^15.4.1",
+    "react-formula-beautifier": "^0.1.4",
+    "react-mixin": "^3.0.5",
+    "react-router": "^3.0.0",
     "reactfire": "^1.0.0"
   },
   "scripts": {

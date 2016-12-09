@@ -3,7 +3,6 @@ import React, { Component } from 'react';
 import beleaf_header from './assets/beleaf_in_yourself.jpg';
 import './App.css';
 import firebase from 'firebase';
-import BeleafsRoot from './BeleafsRoot'
 
 class App extends Component {
   
@@ -23,10 +22,11 @@ class App extends Component {
           <img src={beleaf_header} alt="beleaf in yourself!"/>
         </div>
         <h2>What do you Beleaf?</h2>
-        <BeleafsRoot/>
+        {this.props.children}
       </div>
     );
   }
+
 }
 
 export default App;
