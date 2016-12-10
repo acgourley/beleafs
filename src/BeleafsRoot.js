@@ -5,6 +5,7 @@ import React, { Component } from 'react';
 import reactMixin from 'react-mixin'
 import './BeleafsRoot.css';
 import _ from 'lodash';
+import {FBSpan, FBVertice} from './types'
 /* 
 
 Firebase Schema 
@@ -17,7 +18,7 @@ Firebase Schema
         0: {
           statement: "...",
           description: "...",
-          children: [1, 2, ...]
+          childrenKeys: {0: 1, 1: 2, ...}
         },
         ...
       },
@@ -27,21 +28,6 @@ Firebase Schema
 
 */
 
-/* Flow Types */
-
-type FBVertice = {
-  '.key': ?string,
-  statement: string,
-  description: string,
-  childrenKeys: ?{[key: string] : string}
-};
-
-type FBSpan = {
-  '.key': string,
-  title: string,
-  rootVerticeKey: string,
-  vertices: {[key: string] : FBVertice}
-};
 
 class VerticeComponent extends Component {
   /* Flow Types (top ones for ReactFireMixin) */
@@ -165,15 +151,26 @@ class SpanComponent extends Component {
     this.bindAsObject(this.props.spanRef, 'span');
   }
 
+  onTitleChange(e) {
+    this.props.spanRef.child('title').set(e.target.value);
+  }
+
   render() {
     const {addVertice, removeVertice, spanRef, editMode} = this.props;
     const {span} = this.state;
     console.log('DEBUG: in SpanComponent render with props:', this.props, 'and state', this.state)
-
+    const ready = span && span.rootVerticeKey;
+    if(editMode) {
+      if(!span.rootVerticeKey) {
+        console.log("adding root vertice")
+         addVertice({}, null);
+      }
+    }
     return (
       <div>
-        {span && <div>
-          <h3>{span.title}</h3>
+        {ready && <div>
+          {editMode && <div><span>Title:</span> <input value={span.title} onChange={this.onTitleChange.bind(this)}/></div> }
+          {!editMode && <h3>{span.title}</h3>}
           <VerticeComponent parentVerticeKey={null} 
             verticeKey={span.rootVerticeKey} verticesRef={spanRef.child('vertices')} 
             addVertice={addVertice} removeVertice={removeVertice} editMode={editMode}/>
@@ -205,38 +202,39 @@ class BeleafsRoot extends Component {
   constructor() {
     super();
     this.state = {
-      span: {},
-      spanRef: null,
+      span: undefined,
+      spanRef: undefined,
     }
   }
 
   componentWillMount() {
-    if(!this.props.params.spanKey || this.props.params.spanKey.length === 0)
-      this.props.params.spanKey = 'span0'; //hack
     const spanRef = firebase.database().ref('beleafs/spans').child(this.props.params.spanKey);
     this.bindAsObject(spanRef, 'span');
     this.setState({spanRef})
   }
 
-  addVertice(spanKey: string, vertice: FBVertice, parentVerticeKey: string) {
-      const verticeToSave: FBVertice = {
-        statement: vertice.statement,
-        description: vertice.description,
-        childrenKeys: {},
-      }
-      const savedVertice = firebase.database().ref(`beleafs/spans/${spanKey}/vertices`).push(verticeToSave);
-      console.log('DEBUG: savedVertice.key is:', savedVertice.key);
-      const parentVertice = firebase.database().ref(`beleafs/spans/${spanKey}/vertices/${parentVerticeKey}/childrenKeys`);
-      const savedChildKey = parentVertice.push(savedVertice.key);
-      console.log('DEBUG: savedChildKey is:', savedChildKey);
+  addVertice(spanKey: string, vertice: FBVertice, parentVerticeKey: ?string) {
+    const verticeToSave: FBVertice = {
+      statement: vertice.statement || '',
+      description: vertice.description || '',
+      childrenKeys: {},
+    }
 
+    const savedVerticeRef = this.firebaseRefs.span.child('vertices').push(verticeToSave);
+    if(!this.state.span.rootVerticeKey) {
+      this.firebaseRefs.span.child('rootVerticeKey').set(savedVerticeRef.key)
+    }
+    console.log('DEBUG: savedVertice.key is:', savedVerticeRef.key);
+    if(parentVerticeKey) {
+      const parentVerticeRef = this.firebaseRefs.span.child('vertices').child(parentVerticeKey).child('childrenKeys');
+      const savedChildKey = parentVerticeRef.push(savedVerticeRef.key);
+      console.log('DEBUG: savedChildKey is:', savedChildKey);
+    }
   }
 
   removeVertice(spanKey: string, verticeKey: string, parentVerticeKey: string) {
-    //var firebaseRef = firebase.database().ref('beleafs/spans');
-    //firebaseRef.child(key).remove();
-    this.firebaseRefs.spans.child(spanKey).child('vertices').child(verticeKey).remove();
-    const childrenKeys = this.firebaseRefs.spans.child(spanKey).child('vertices').child(parentVerticeKey).child('childrenKeys')
+    this.firebaseRefs.span.child(spanKey).child('vertices').child(verticeKey).remove();
+    const childrenKeys = this.firebaseRefs.span.child('vertices').child(parentVerticeKey).child('childrenKeys')
     childrenKeys.orderByValue().equalTo(verticeKey).on("value", function(snapshot) {
       console.log('snapshot:', snapshot)
       snapshot.forEach((data) => {
@@ -248,7 +246,11 @@ class BeleafsRoot extends Component {
 
   render() {
     const {params} = this.props;
-    const validSpan = this.state.span && this.state.span.title;
+    const {span} = this.state;
+    const validSpan = span && _.has(span, 'title') //a blank string is a valid title so check with _.has
+    const notFoundSpan = span && !_.has(span, 'title')
+    const loadingSpan = !span;
+    console.log('debug: rendering with span:', span, _.keys(span).length)
     return (
       <div className="beleafsRoot">
         {validSpan && <SpanComponent spanRef={this.state.spanRef} 
@@ -256,7 +258,8 @@ class BeleafsRoot extends Component {
             removeVertice={(verticeKey, parentVerticeKey)=>this.removeVertice(params.spanKey, verticeKey, parentVerticeKey)}
             editMode={params.editMode} />
         }
-        {!validSpan && <p>Unknown span key <b>{params.spanKey}</b></p>}
+        {loadingSpan && <p>Loading span...</p>}
+        {notFoundSpan && <p>Could not load span <b>{params.spanKey}</b></p>}
       </div>
     );
   }

@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import beleaf_header from './assets/beleaf_in_yourself.jpg';
 import './App.css';
 import firebase from 'firebase';
+import { Link } from 'react-router'
 
 class App extends Component {
   
@@ -19,9 +20,8 @@ class App extends Component {
     return (
       <div className="App">
         <div className="App-header">
-          <img src={beleaf_header} alt="beleaf in yourself!"/>
+          <Link to="/"><img src={beleaf_header} alt="beleaf in yourself!"/></Link>
         </div>
-        <h2>What do you Beleaf?</h2>
         {this.props.children}
       </div>
     );
