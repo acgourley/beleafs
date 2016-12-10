@@ -19,12 +19,14 @@ class App extends Component {
 
   render() {
     return (
+      <div id="container">
       <Nav>
         <div className="App-header">
           <Link to="/"><img src={beleaf_header} alt="beleaf in yourself!"/></Link>
         </div>
         {this.props.children}
       </Nav>
+      </div>
     );
   }
 

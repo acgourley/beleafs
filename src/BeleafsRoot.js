@@ -95,20 +95,21 @@ class VerticeComponent extends Component {
             console.log('replaced one math block, result:', processedStatement)
         }
       } while (m);
+
     }
     console.log('DEBUG: in VerticeComponent render with props:', this.props)
+    const suffix = (vertice.childrenKeys && _.keys(vertice.childrenKeys).length > 0) ? '<b class="suffix">thus </b>' : ''
     return (
-      <div className="vertice" >
+      <div className={'vertice' + (parentVerticeKey ? '' : ' rootVertice')} >
         <div>
           {_.map(vertice.childrenKeys, (childVerticeKey: string) => 
             <VerticeComponent parentVerticeKey={verticeKey} verticeKey={childVerticeKey} 
               verticesRef={verticesRef} addVertice={addVertice} removeVertice={removeVertice} editMode={editMode}/> 
           )}
         </div>
+        {!editMode && <div className="verticeContent" dangerouslySetInnerHTML={{__html: suffix + processedStatement }}/>}
+
         {editMode && <textarea cols={100} onChange={this.onStatementChange.bind(this)} value={ vertice.statement } />}
-        {!editMode && <div dangerouslySetInnerHTML={{__html: processedStatement }}/>}
-
-
         {editMode && <button onClick={this.onAddClicked.bind(this)}>{ `Add Leaffriend`}</button>}
         {editMode && parentVerticeKey && !_.keys(vertice.childrenKeys).length && 
           <span className="delete" onClick={ removeVertice.bind(null, verticeKey, parentVerticeKey) }>
