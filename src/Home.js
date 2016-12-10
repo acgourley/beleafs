@@ -16,6 +16,10 @@ export default class Home extends Component {
     spans: {[key: string]: FBSpan},
     spansRef: Object,
   };
+  
+  static contextTypes = {
+    userData: React.PropTypes.object,
+  };
 
   componentWillMount() {
     const spansRef = firebase.database().ref('beleafs/spans')
@@ -29,9 +33,10 @@ export default class Home extends Component {
   }
 
   render() {
+    const {userData} = this.context;
     return (
       <div>
-        Welcome to a very early prototype of Belief Trees. 
+        Welcome {userData && userData.email} to a very early prototype of Belief Trees. 
         <ul>
           {_.map(this.state.spans, ((span, key) => 
             key !== '.key' && <div key={key}>
