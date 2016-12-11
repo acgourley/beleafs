@@ -6,6 +6,7 @@ import reactMixin from 'react-mixin'
 import { Link } from 'react-router'
 import {FBSpan} from './types'
 import _ from 'lodash';
+import './Home.css';
 
 export default class Home extends Component {
   bindAsArray: Function;
