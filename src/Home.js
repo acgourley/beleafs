@@ -36,7 +36,7 @@ export default class Home extends Component {
     const {userData} = this.context;
     return (
       <div>
-        Welcome {userData && userData.email} to a very early prototype of Belief Trees. 
+        <h1>Welcome {userData && userData.email} to a very early prototype of Belief Trees. </h1>
         <ul>
           {_.map(this.state.spans, ((span, key) => 
             key !== '.key' && <div key={key}>

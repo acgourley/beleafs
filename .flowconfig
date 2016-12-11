@@ -8,3 +8,4 @@
 [options]
 module.name_mapper.extension='css' -> '<PROJECT_ROOT>/package.json'
 module.name_mapper.extension='jpg' -> '<PROJECT_ROOT>/package.json'
+module.name_mapper.extension='svg' -> '<PROJECT_ROOT>/package.json'
