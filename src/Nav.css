@@ -1,0 +1,36 @@
+
+#nav {
+/* https://developer.microsoft.com/en-us/microsoft-edge/testdrive/demos/svgradientbackgroundmaker/ */
+background-image:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAxIDEiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPgo8cmFkaWFsR3JhZGllbnQgaWQ9Imc2OSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIGN4PSIyNS40MDcxNjYxMjM3Nzg1MDIlIiBjeT0iNS43MTQyODU3MTQyODU3MTQlIiByPSI1MCUiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMzA0QzY4IiBvZmZzZXQ9IjAiLz48c3RvcCBzdG9wLWNvbG9yPSIjMjIyRTNDIiBvZmZzZXQ9IjEiLz4KPC9yYWRpYWxHcmFkaWVudD4KPHJlY3QgeD0iLTUwIiB5PSItNTAiIHdpZHRoPSIxMDEiIGhlaWdodD0iMTAxIiBmaWxsPSJ1cmwoI2c2OSkiIC8+Cjwvc3ZnPg==);  
+height: 66px;
+}
+
+.logo {
+  font-family: 'PT Serif';
+  font-weight: bold;
+  color: white;
+  font-size: 36px;
+  margin: 10px;
+  width: 200px;
+  float: left;
+}
+
+.logo > .word2 {
+  color: #C0DDDD;
+}
+
+.navButton {
+  float: right;
+  font-family: 'PT Sans';
+  font-weight: bold;
+  color: white;
+  margin: 10px;
+  height: 30px;
+  width: 100px
+}
+.navButton > img {
+  float: left;
+}
+
+.navButton > span {
+}

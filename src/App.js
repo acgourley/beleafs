@@ -1,6 +1,5 @@
 //@flow
 import React, { Component } from 'react'
-import beleaf_header from './assets/beleaf_in_yourself.jpg'
 import './App.css';
 import firebase from 'firebase'
 import { Link } from 'react-router'
@@ -20,12 +19,9 @@ class App extends Component {
   render() {
     return (
       <div id="container">
-      <Nav>
-        <div className="App-header">
-          <Link to="/"><img src={beleaf_header} alt="beleaf in yourself!"/></Link>
-        </div>
+        <Nav>
         {this.props.children}
-      </Nav>
+        </Nav>
       </div>
     );
   }
