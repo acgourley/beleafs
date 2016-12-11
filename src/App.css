@@ -10,7 +10,7 @@
 #nav {
 /* https://developer.microsoft.com/en-us/microsoft-edge/testdrive/demos/svgradientbackgroundmaker/ */
 background-image:url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIHZpZXdCb3g9IjAgMCAxIDEiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiPgo8cmFkaWFsR3JhZGllbnQgaWQ9Imc2OSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiIGN4PSIyNS40MDcxNjYxMjM3Nzg1MDIlIiBjeT0iNS43MTQyODU3MTQyODU3MTQlIiByPSI1MCUiPgo8c3RvcCBzdG9wLWNvbG9yPSIjMzA0QzY4IiBvZmZzZXQ9IjAiLz48c3RvcCBzdG9wLWNvbG9yPSIjMjIyRTNDIiBvZmZzZXQ9IjEiLz4KPC9yYWRpYWxHcmFkaWVudD4KPHJlY3QgeD0iLTUwIiB5PSItNTAiIHdpZHRoPSIxMDEiIGhlaWdodD0iMTAxIiBmaWxsPSJ1cmwoI2c2OSkiIC8+Cjwvc3ZnPg==);  
-height: 66px;
+height: 50px;
 }
 
 #content {
@@ -35,7 +35,10 @@ height: 66px;
   width: 200px;
   float: left;
   text-shadow: 1px 1px #000;
-
+}
+.mode5logo{
+  height: 30px;
+  margin: 10px;
 }
 
 .logo > .word2 {
@@ -63,6 +66,13 @@ h1, h2, h3 {
   font-weight: bold;
   color: white;
   text-shadow: 1px 1px #000;
+}
+
+a:link {
+  color: #DDF;
+}
+a:visited {
+  color: #CCD;
 }
 
 .github {

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="353px" height="62px" viewBox="0 0 353 62" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 3.8.1 (29687) - http://www.bohemiancoding.com/sketch -->
+    <title>space</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <text id="text-1" font-family="ModeG-Regular, Mode G" font-size="50" font-weight="normal" letter-spacing="1.9" fill="#FFFFFF">
+            <tspan x="15" y="60">b</tspan>
+            <tspan x="52.8" y="60" letter-spacing="2">elief</tspan>
+        </text>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="1" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="0.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <text id="text-3" font-family="ModeG-Regular, Mode G" font-size="50" font-weight="normal" letter-spacing="2" fill="#C0DDDD">
+            <tspan x="175" y="60">spac</tspan>
+            <tspan x="316.35" y="60">e</tspan>
+        </text>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-4">
+            <feOffset dx="1" dy="1" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="0.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0   0 0 0 0 0   0 0 0 0 0  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" fill-opacity="1">
+        <g id="Artboard-10" transform="translate(-38.000000, -342.000000)">
+            <g id="Group-2" transform="translate(38.000000, 332.000000)">
+                <g id="belief" fill="#FFFFFF">
+                    <use filter="url(#filter-2)" xlink:href="#text-1"></use>
+                    <use xlink:href="#text-1"></use>
+                </g>
+                <g id="space" fill="#C0DDDD">
+                    <use filter="url(#filter-4)" xlink:href="#text-3"></use>
+                    <use xlink:href="#text-3"></use>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
