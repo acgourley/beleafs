@@ -30,20 +30,23 @@ height: 50px;
   font-family: 'PT Serif';
   font-weight: bold;
   color: white;
-  font-size: 36px;
-  margin: 10px;
+  font-size: 28px;
+  height: 50px;
+  line-height: 50px;
+  margin-left: 16px;
   width: 200px;
   float: left;
   text-shadow: 1px 1px #000;
+}
+.logo > .word2 {
+  color: #C0DDDD;
 }
 .mode5logo{
   height: 30px;
   margin: 10px;
 }
 
-.logo > .word2 {
-  color: #C0DDDD;
-}
+
 
 .navButton {
   float: right;
@@ -52,6 +55,7 @@ height: 50px;
   color: white;
   margin: 10px;
   height: 30px;
+  line-height: 30px;
   width: 100px
 }
 .navButton > img {

@@ -31,6 +31,15 @@
   color: black;
 }
 
+.verticeSelf{
+  height: 80px;
+}
+
+
+textarea {
+  outline: none;
+}
+
 .suffix {
   font-family: 'PT Serif', serif;
 }

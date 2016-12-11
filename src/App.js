@@ -9,7 +9,7 @@ import telescopeIcon from './assets/telescope1.svg'
 import helmetIcon from './assets/helmet1.svg'
 import githubIcon from './assets/github.svg'
 import { Link } from 'react-router'
-import mode5Logo from './assets/logo_mode5.svg'
+import mode5Logo from './assets/logo_mode5.png'
 
 class App extends Component {
   bindAsArray: Function;
@@ -80,8 +80,8 @@ class App extends Component {
     return (
       <div id="NavContentFooter">
         <div id="nav">
-          {/*<Link to="/" ><div className="logo"><span className="word1">Belief</span> <span className="word2">Space</span></div></Link>*/}
-          <Link to="/" ><img className="mode5logo" src={mode5Logo}></img></Link>
+          <Link to="/" ><div className="logo"><span className="word1">Belief</span> <span className="word2">Space</span></div></Link>
+          {/*<Link to="/" ><img className="mode5logo" src={mode5Logo}></img></Link>*/}
           {!userData && <Link to="" onClick={this.login.bind(this)}><div className="navButton">
             <img src={helmetIcon}/>
             <span>login</span>

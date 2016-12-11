@@ -6,6 +6,8 @@ import reactMixin from 'react-mixin'
 import './BeleafsRoot.css';
 import _ from 'lodash';
 import {FBSpan, FBVertice} from './types'
+import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+
 /* 
 
 Firebase Schema 
@@ -110,7 +112,7 @@ class VerticeComponent extends Component {
     console.log('DEBUG: in VerticeComponent render with props:', this.props)
     const suffix = (vertice.childrenKeys && _.keys(vertice.childrenKeys).length > 0) ? '<b class="suffix">thus </b>' : ''
     return (
-      <div className={'vertice' + (parentVerticeKey ? '' : ' rootVertice')} >
+      <div className={'vertice' + (parentVerticeKey ? '' : ' rootVertice')} id={verticeKey} >
         <div>
           {_.map(childrenKeys, (childrenKeysEntry) => {
               const childVerticeKey = childrenKeysEntry['.value'];
@@ -119,36 +121,41 @@ class VerticeComponent extends Component {
             }
           )}
         </div>
-        {!editMode && <div className="verticeContent" dangerouslySetInnerHTML={{__html: suffix + processedStatement }}/>}
 
-        {editMode && <textarea cols={100} onChange={this.onStatementChange.bind(this)} value={ vertice.statement } />}
-        {editMode && <button onClick={this.onAddClicked.bind(this)}>{ `Add Leaffriend`}</button>}
-        
-        {editMode && parentVerticeKey && 
-          <span className="move" onClick={ dataOperations.moveTopwards.bind(null, verticeKey, parentVerticeKey) }>
-            UP
-          </span>
-        }
-        {editMode && parentVerticeKey && 
-          <span className="move" onClick={ dataOperations.moveBottomwards.bind(null, verticeKey, parentVerticeKey) }>
-            DOWN
-          </span>
-        }
-        {editMode && parentVerticeKey && 
-          <span className="move" onClick={ dataOperations.moveShallower.bind(null, verticeKey, parentVerticeKey) }>
-            LEFT
-          </span>
-        }
-        {editMode && parentVerticeKey && 
-          <span className="move" onClick={ dataOperations.moveDeeper.bind(null, verticeKey, parentVerticeKey) }>
-            RIGHT
-          </span>
-        }
-        {editMode && parentVerticeKey && !_.keys(vertice.childrenKeys).length && 
-          <span className="delete" onClick={ dataOperations.removeVerticeFrom.bind(null, verticeKey, parentVerticeKey) }>
-            DELETE
-          </span>
-        }
+        <div className="verticeSelf">
+          {!editMode && <div className="verticeContent" dangerouslySetInnerHTML={{__html: suffix + processedStatement }}/>}
+
+          {editMode && <textarea cols={100} placeholder="Enter a statement"
+            onChange={this.onStatementChange.bind(this)} value={ vertice.statement } />}
+          {editMode && <span className="move" onClick={this.onAddClicked.bind(this)}>{ `+CHILD`}</span>}
+          
+          {editMode && parentVerticeKey && 
+            <span className="move" onClick={ dataOperations.moveTopwards.bind(null, verticeKey, parentVerticeKey) }>
+              UP
+            </span>
+          }
+          {editMode && parentVerticeKey && 
+            <span className="move" onClick={ dataOperations.moveBottomwards.bind(null, verticeKey, parentVerticeKey) }>
+              DOWN
+            </span>
+          }
+          {editMode && parentVerticeKey && 
+            <span className="move" onClick={ dataOperations.moveShallower.bind(null, verticeKey, parentVerticeKey) }>
+              LEFT
+            </span>
+          }
+          {editMode && parentVerticeKey && 
+            <span className="move" onClick={ dataOperations.moveDeeper.bind(null, verticeKey, parentVerticeKey) }>
+              RIGHT
+            </span>
+          }
+          {editMode && parentVerticeKey && !_.keys(vertice.childrenKeys).length && 
+            <span className="delete" onClick={ dataOperations.removeVerticeFrom.bind(null, verticeKey, parentVerticeKey) }>
+              DELETE
+            </span>
+          }
+        </div>
+
         
       </div>
     );
@@ -231,6 +238,10 @@ class BeleafsRoot extends Component {
   state: {
     span: ?FBSpan,
     spanRef: ?Object,
+  };
+
+  static contextTypes = {
+    userData: React.PropTypes.object,
   };
 
   constructor() {
@@ -388,13 +399,15 @@ class BeleafsRoot extends Component {
   render() {
     const {params} = this.props;
     const {span} = this.state;
+    const {userData} = this.context;
     const validSpan = span && _.has(span, 'title') //a blank string is a valid title so check with _.has
     const notFoundSpan = span && !_.has(span, 'title')
     const loadingSpan = !span;
     console.log('debug: rendering with span:', span, _.keys(span).length)
     return (
       <div className="beleafsRoot">
-        {validSpan && this.state.spanRef && <SpanComponent spanRef={this.state.spanRef} 
+        {!userData && <h2> You must login to edit a span</h2>}
+        {userData && validSpan && this.state.spanRef && <SpanComponent spanRef={this.state.spanRef} 
             dataOperations={this.dataOperations}
             editMode={params.editMode === 'edit'} />
         }
