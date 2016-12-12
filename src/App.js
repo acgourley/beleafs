@@ -9,7 +9,6 @@ import telescopeIcon from './assets/telescope1.svg'
 import helmetIcon from './assets/helmet1.svg'
 import githubIcon from './assets/github.svg'
 import { Link } from 'react-router'
-import mode5Logo from './assets/logo_mode5.png'
 
 class App extends Component {
   bindAsArray: Function;
@@ -82,16 +81,16 @@ class App extends Component {
         <div id="nav">
           <Link to="/" ><div className="logo"><span className="word1">Belief</span> <span className="word2">Space</span></div></Link>
           {/*<Link to="/" ><img className="mode5logo" src={mode5Logo}></img></Link>*/}
-          {!userData && <Link to="" onClick={this.login.bind(this)}><div className="navButton">
-            <img src={helmetIcon}/>
+          {!userData && <div className="navButton" onClick={this.login.bind(this)}>
+            <img src={helmetIcon} alt="login"/>
             <span>login</span>
-          </div></Link>}
-          {userData && <Link to="" onClick={this.logout.bind(this)}><div className="navButton">
-            <img src={helmetIcon}/>
+          </div>}
+          {userData && <div className="navButton" onClick={this.logout.bind(this)}>
+            <img src={helmetIcon} alt="login"/>
             <span>logout</span>
-          </div></Link>}
+          </div>}
           <Link to="/"><div className="navButton">
-            <img src={telescopeIcon}/>
+            <img src={telescopeIcon} alt="explore"/>
             <span>explore</span>
           </div></Link>
         </div>
@@ -99,7 +98,7 @@ class App extends Component {
           {this.props.children}
         </div>
         <div id="footer">
-          <a href="https://github.com/acgourley/beleafs" className="github"><img src={githubIcon}/></a>
+          <a href="https://github.com/acgourley/beleafs" className="github"><img src={githubIcon} alt="github"/></a>
         </div>
       </div>
     );

@@ -56,7 +56,8 @@ height: 50px;
   margin: 10px;
   height: 30px;
   line-height: 30px;
-  width: 100px
+  width: 100px;
+  cursor: pointer;
 }
 .navButton > img {
   float: left;

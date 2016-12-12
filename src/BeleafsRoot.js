@@ -6,7 +6,8 @@ import reactMixin from 'react-mixin'
 import './BeleafsRoot.css';
 import _ from 'lodash';
 import {FBSpan, FBVertice} from './types'
-import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+//import ReactCSSTransitionGroup from 'react-addons-css-transition-group';
+import { Link } from 'react-router'
 
 /* 
 
@@ -307,7 +308,6 @@ class BeleafsRoot extends Component {
         return true;
       },
       moveTopwards: (verticeKey: string, parentVerticeKey: string) => {
-        const verticeRef = spanVerticesRef.child(verticeKey)
         const siblingsRef = spanVerticesRef.child(parentVerticeKey).child('childrenKeys')
         return siblingsRef.orderByKey().once("value", (siblingsSnap) => {
           let targetSiblingSnap, skywardBrotherSnap = null;
@@ -333,7 +333,6 @@ class BeleafsRoot extends Component {
         
       },
       moveBottomwards: (verticeKey: string, parentVerticeKey: string) => {
-        const verticeRef = spanVerticesRef.child(verticeKey)
         const siblingsRef = spanVerticesRef.child(parentVerticeKey).child('childrenKeys')
         return siblingsRef.orderByKey().once("value", (siblingsSnap) => {
           let targetSiblingSnap, groundwardsBrotherSnap = null;
@@ -359,7 +358,6 @@ class BeleafsRoot extends Component {
         })
       },
       moveDeeper: (verticeKey: string, parentVerticeKey: string) => {
-        const verticeRef = spanVerticesRef.child(verticeKey)
         const siblingsRef = spanVerticesRef.child(parentVerticeKey).child('childrenKeys')
         return siblingsRef.orderByKey().once("value", (siblingsSnap) => {
           let targetSiblingSnap, groundwardsBrotherSnap = null;
@@ -418,15 +416,18 @@ class BeleafsRoot extends Component {
 
   render() {
     const {params} = this.props;
-    const {span} = this.state;
+    const {span, spanRef} = this.state;
     const {userData} = this.context;
     const validSpan = span && _.has(span, 'title') //a blank string is a valid title so check with _.has
     const notFoundSpan = span && !_.has(span, 'title')
     const loadingSpan = !span;
+    const editMode = params.editMode === 'edit';
     return (
       <div className="beleafsRoot">
-        {!userData && <h2> You must login to edit a span</h2>}
-        {userData && validSpan && this.state.spanRef && <SpanComponent spanRef={this.state.spanRef} 
+        {editMode && !userData && <h2> You must login to edit a span</h2>}
+        {editMode && <Link to={`/spans/${spanRef.key}`}> switch to view mode </Link>}
+        {!editMode && userData && <Link to={`/spans/${spanRef.key}/edit`}> switch to edit mode </Link>}
+        {((editMode && userData) || editMode === false) && validSpan && spanRef && <SpanComponent spanRef={spanRef} 
             dataOperations={this.dataOperations}
             editMode={params.editMode === 'edit'} />
         }
