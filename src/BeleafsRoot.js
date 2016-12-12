@@ -95,9 +95,7 @@ class VerticeComponent extends Component {
     let m = ""
     do {
       m = re.exec(s);
-      console.log('match:', m)
       if (m) {
-          console.log(m[2]);
           s = s.replace(m[0], global.katex.renderToString(m[2]));
       }
     } while (m);
@@ -132,7 +130,7 @@ class VerticeComponent extends Component {
           {!editMode && (
             <div className="verticeView">
               <span className="prefix">{prefix}</span>
-              <span dangerouslySetInnerHTML={{__html: processedStatement }}/>
+              <span className="statement" dangerouslySetInnerHTML={{__html: processedStatement }}/>
               {processedDescription && <span className="description"> - because </span>}
               {processedDescription && <span className="description" dangerouslySetInnerHTML={{__html: processedDescription }}/>}
             </div>

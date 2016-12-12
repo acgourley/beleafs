@@ -29,15 +29,21 @@
   padding: 9px;
   font-family: 'PT Serif', serif;
   color: black;
+  font-size: 16px;
 }
 
 .prefix {
   font-weight: bold;
+  color: black;
+  color: #111;
+
 }
 .statement {
+  color: #333;
 }
 .description {
   font-style: italic;
+  color: #333;
 }
 
 .verticeSelf{
