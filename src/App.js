@@ -32,14 +32,18 @@ class App extends Component {
 
   componentWillMount() {
     var config = {
-        apiKey: "AIzaSyCj-OgHro-jA6r5CxfITVHJh52gCM9crP8",
-        authDomain: "beleafs-6f378.firebaseapp.com",
-        databaseURL: "https://beleafs-6f378.firebaseio.com"
-      };
+      apiKey: "AIzaSyCj-OgHro-jA6r5CxfITVHJh52gCM9crP8",
+      authDomain: "beleafs-6f378.firebaseapp.com",
+      databaseURL: "https://beleafs-6f378.firebaseio.com"
+    };
     firebase.initializeApp(config);
     firebase.auth().onAuthStateChanged((user) => {
       if (user) {
         this.setState({userData: user})
+        console.log('login: ', user)
+        firebase.database().ref('beleafs/users').child(user.uid).set({
+          email: user.email, username: user.displayName, createdAt: firebase.database.ServerValue.TIMESTAMP
+        });
       } else {
         // No user is signed in.
       }
@@ -50,16 +54,19 @@ class App extends Component {
     return {userData: this.state.userData};
   }
 
-
   logout(e) {
     firebase.auth().signOut().then(result => {
-      this.setState({userData: null})
+      
+      firebase.auth().signOut().then(() => {
+        this.setState({userData: null})
+      });
     });
   }
 
   login(e){
     console.log('login')
     var provider = new firebase.auth.GoogleAuthProvider();
+    provider.setCustomParameters({'prompt': 'select_account'});
     firebase.auth().signInWithPopup(provider).then((result) => {
       //var token = result.credential.accessToken;
       var user = result.user;

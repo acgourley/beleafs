@@ -1,6 +1,65 @@
+
 {
   "rules": {
-    ".read": true,
-    ".write": "auth != null"
+    "beleafs": {
+      ".read": "true",
+      "users": {
+        "$user_id": {
+          ".write": "$user_id === auth.uid",
+          ".validate": "newData.hasChildren(['email', 'username'])",
+          "email": {
+            ".read": "$user_id === auth.uid",
+            ".validate": "newData.val().length > 0 && newData.val().length < 256"
+          },
+          "username": {
+            ".validate": "newData.val().length > 0 && newData.val().length < 256"
+          }
+        }
+      },
+      "spans": {
+        "$span_id": {
+          ".write": "true || data.val() === null || data.child('createdBy').val() === auth.uid",
+          ".read": "data.child('isPrivate').val() !== true || data.child('editors').child(auth.uid).val() !== null",
+          ".validate": "newData.hasChildren(['title'])",
+          "title": {
+            ".validate": "newData.val().length < 256"
+          },
+          "rootVerticeKey": {
+            ".validate": "newData.parent().child('vertices').child(newData.val()).val() !== null"
+          },
+          "createdBy": {
+            ".validate": "newData.val() === auth.uid"
+          },
+          "createdAt": {
+            ".validate": "(data.val() !== null || newData.val() <= now) || data.val() === newData.val()"
+          },
+          "isPrivate": {
+            ".validate":"newData.isBoolean()"
+          },
+          "editors": {
+            "$user_id" : {
+              ".write": "auth.uid === newData.parent().parent().child('createdBy').val() || data.parent().child(auth.uid).val() !== null",
+              ".validate": "newData.isString() && root.child('users').child(newData.val()).val() !== null"
+            }
+          },
+          "vertices": {
+            "$vertice_id": {
+              ".validate": "newData.hasChildren(['statement', 'description'])",
+              "statement": {
+                ".validate": "newData.val().length < 10000"
+              },
+              "description": {
+                ".validate": "newData.val().length < 10000"
+              },
+              "childrenKeys": {
+                "$child_key_id": {
+                  ".validate" : "newData.isString() && data.parent().parent().parent().hasChild(newData.val())"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

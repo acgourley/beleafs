@@ -131,7 +131,7 @@ class VerticeComponent extends Component {
             <div className="verticeView">
               <span className="prefix">{prefix}</span>
               <span className="statement" dangerouslySetInnerHTML={{__html: processedStatement }}/>
-              {processedDescription && <span className="description"> - because </span>}
+              {processedDescription && <span className="description"> &mdash; because </span>}
               {processedDescription && <span className="description" dangerouslySetInnerHTML={{__html: processedDescription }}/>}
             </div>
           )}
