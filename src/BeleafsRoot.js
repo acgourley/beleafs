@@ -50,6 +50,8 @@ class VerticeComponent extends Component {
     parentVerticeKey: ?string,
     verticesRef: Object,
     editMode: ?boolean,
+    hasSiblingAbove: boolean,
+    hasSiblingBelow: boolean,
   };
 
   state: {
@@ -83,77 +85,95 @@ class VerticeComponent extends Component {
     this.props.verticesRef.child(this.props.verticeKey).child('statement').set(e.target.value);
   }
 
+  onDescriptionChange(e) {
+    this.props.verticesRef.child(this.props.verticeKey).child('description').set(e.target.value);
+  }
+
+  stringToKatexHtml(s : string) {
+    const re = /<(km|katexmath)>(.*?)<\/(km|katexmath)>/g;
+    let m = ""
+    do {
+      m = re.exec(s);
+      console.log('match:', m)
+      if (m) {
+          console.log(m[2]);
+          s = s.replace(m[0], global.katex.renderToString(m[2]));
+      }
+    } while (m);
+    return s;
+  }
+
   render() {
-    const {dataOperations, verticesRef, verticeKey, parentVerticeKey, editMode} = this.props;
+    const {dataOperations, verticesRef, verticeKey, parentVerticeKey, editMode, hasSiblingAbove, hasSiblingBelow} = this.props;
     const {vertice, childrenKeys} = this.state;
 
+    let processedStatement = !editMode && this.stringToKatexHtml(vertice.statement);
+    let processedDescription = !editMode && this.stringToKatexHtml(vertice.description);
+    
+    let prefix = hasSiblingAbove ? "And " : "As "
+    if(vertice.childrenKeys && _.keys(vertice.childrenKeys).length > 0) 
+      prefix = "Thus "
 
-    /*let katexHTML = ""
-    try {
-      katexHTML = global.katex.renderToString( vertice.statement);//"c = \\pm\\sqrt{a^2 + b^2}");
-    } catch (e) {
-      console.log("error parsing tex:", e)
-    }*/
-    let processedStatement = vertice.statement;
-    if(!editMode) {
-      const re = /<katexmath>(.*?)<\/katexmath>/g;
-      let m = ""
-      do {
-        m = re.exec(processedStatement);
-        console.log('match:', m)
-        if (m) {
-            console.log(m[1]);
-            processedStatement = processedStatement.replace(m[0], global.katex.renderToString(m[1]));
-            console.log('replaced one math block, result:', processedStatement)
-        }
-      } while (m);
-
-    }
-    console.log('DEBUG: in VerticeComponent render with props:', this.props)
-    const suffix = (vertice.childrenKeys && _.keys(vertice.childrenKeys).length > 0) ? '<b class="suffix">thus </b>' : ''
     return (
       <div className={'vertice' + (parentVerticeKey ? '' : ' rootVertice')} id={verticeKey} >
         <div>
-          {_.map(childrenKeys, (childrenKeysEntry) => {
+          {_.map(childrenKeys, (childrenKeysEntry, i) => {
               const childVerticeKey = childrenKeysEntry['.value'];
               return <VerticeComponent key={childVerticeKey} parentVerticeKey={verticeKey} verticeKey={childVerticeKey} 
-              verticesRef={verticesRef} dataOperations={dataOperations} editMode={editMode}/> 
+                verticesRef={verticesRef} dataOperations={dataOperations} editMode={editMode}
+                hasSiblingAbove={i > 0} hasSiblingBelow={i < childrenKeys.length - 1}
+              /> 
             }
           )}
         </div>
 
         <div className="verticeSelf">
-          {!editMode && <div className="verticeContent" dangerouslySetInnerHTML={{__html: suffix + processedStatement }}/>}
+          {!editMode && (
+            <div className="verticeView">
+              <span className="prefix">{prefix}</span>
+              <span dangerouslySetInnerHTML={{__html: processedStatement }}/>
+              {processedDescription && <span className="description"> - because </span>}
+              {processedDescription && <span className="description" dangerouslySetInnerHTML={{__html: processedDescription }}/>}
+            </div>
+          )}
 
-          {editMode && <textarea cols={100} placeholder="Enter a statement"
-            onChange={this.onStatementChange.bind(this)} value={ vertice.statement } />}
-          {editMode && <span className="move" onClick={this.onAddClicked.bind(this)}>{ `+CHILD`}</span>}
-          
-          {editMode && parentVerticeKey && 
-            <span className="move" onClick={ dataOperations.moveTopwards.bind(null, verticeKey, parentVerticeKey) }>
-              UP
-            </span>
-          }
-          {editMode && parentVerticeKey && 
-            <span className="move" onClick={ dataOperations.moveBottomwards.bind(null, verticeKey, parentVerticeKey) }>
-              DOWN
-            </span>
-          }
-          {editMode && parentVerticeKey && 
-            <span className="move" onClick={ dataOperations.moveShallower.bind(null, verticeKey, parentVerticeKey) }>
-              LEFT
-            </span>
-          }
-          {editMode && parentVerticeKey && 
-            <span className="move" onClick={ dataOperations.moveDeeper.bind(null, verticeKey, parentVerticeKey) }>
-              RIGHT
-            </span>
-          }
-          {editMode && parentVerticeKey && !_.keys(vertice.childrenKeys).length && 
-            <span className="delete" onClick={ dataOperations.removeVerticeFrom.bind(null, verticeKey, parentVerticeKey) }>
-              DELETE
-            </span>
-          }
+          {editMode && (
+            <div className="verticeEdit">
+              <p>{prefix}</p>
+              <textarea cols={100} placeholder="Enter a statement"
+                onChange={this.onStatementChange.bind(this)} value={ vertice.statement } />
+              <p>because</p>
+              <textarea cols={100} placeholder="Enter an explaination"
+                onChange={this.onDescriptionChange.bind(this)} value={ vertice.description } />
+              <br/>
+              <span className="move" onClick={this.onAddClicked.bind(this)}>{ `+CHILD`}</span>
+              
+              {parentVerticeKey && hasSiblingAbove && 
+                <span className="move" onClick={ dataOperations.moveTopwards.bind(null, verticeKey, parentVerticeKey) }>
+                  UP
+                </span>
+              }
+              {parentVerticeKey && hasSiblingBelow && 
+                <span className="move" onClick={ dataOperations.moveBottomwards.bind(null, verticeKey, parentVerticeKey) }>
+                  DOWN
+                </span>
+              }
+              {parentVerticeKey && 
+                <span className="move" onClick={ dataOperations.moveShallower.bind(null, verticeKey, parentVerticeKey) }>
+                  LEFT
+                </span>
+              }
+              {parentVerticeKey && 
+                <span className="move" onClick={ dataOperations.moveDeeper.bind(null, verticeKey, parentVerticeKey) }>
+                  RIGHT
+                </span>
+              }
+              {parentVerticeKey && !_.keys(vertice.childrenKeys).length && 
+                <span className="delete" onClick={ dataOperations.removeVerticeFrom.bind(null, verticeKey, parentVerticeKey) }>
+                  DELETE
+                </span>}
+            </div>
+          )}
         </div>
 
         
@@ -197,7 +217,6 @@ class SpanComponent extends Component {
   render() {
     const {dataOperations, spanRef, editMode} = this.props;
     const {span} = this.state;
-    console.log('DEBUG: in SpanComponent render with props:', this.props, 'and state', this.state)
     const ready = span && span.rootVerticeKey;
     if(editMode) {
       if(!span.rootVerticeKey) {
@@ -212,7 +231,8 @@ class SpanComponent extends Component {
           {!editMode && <h3>{span.title}</h3>}
           <VerticeComponent parentVerticeKey={null} 
             verticeKey={span.rootVerticeKey} verticesRef={spanRef.child('vertices')} 
-            dataOperations={dataOperations} editMode={editMode}/>
+            dataOperations={dataOperations} editMode={editMode}
+            hasSiblingAbove={false} hasSiblingBelow={false}/>
         </div>}
       </div>
     );
@@ -403,7 +423,6 @@ class BeleafsRoot extends Component {
     const validSpan = span && _.has(span, 'title') //a blank string is a valid title so check with _.has
     const notFoundSpan = span && !_.has(span, 'title')
     const loadingSpan = !span;
-    console.log('debug: rendering with span:', span, _.keys(span).length)
     return (
       <div className="beleafsRoot">
         {!userData && <h2> You must login to edit a span</h2>}

@@ -19,27 +19,34 @@
   margin: 10px 0px 10px 30px;
 }
 
-.rootVertice > .verticeContent{
+.rootVertice > .verticeSelf > .verticeView{
   font-size: 20px;
   background-color: #CEE;
-
 }
 
-.verticeContent {
+.verticeView {
   background-color: #EEE;
   padding: 9px;
+  font-family: 'PT Serif', serif;
   color: black;
 }
 
-.verticeSelf{
-  height: 80px;
+.prefix {
+  font-weight: bold;
+}
+.statement {
+}
+.description {
+  font-style: italic;
 }
 
+.verticeSelf{
+}
 
+.verticeEdit > p {
+  margin: 0px;
+}
 textarea {
   outline: none;
 }
 
-.suffix {
-  font-family: 'PT Serif', serif;
-}
