@@ -2,24 +2,23 @@
 import firebase from 'firebase'
 import ReactFireMixin from 'reactfire'
 import React, { Component } from 'react'
+import PropTypes from 'prop-types';
 import reactMixin from 'react-mixin'
 import { Link } from 'react-router'
 import {FBSpan} from './types'
 import _ from 'lodash';
 import './Home.css';
 
-export default class Home extends Component {
+export default class Home extends Component<$FlowFixMeProps, {
+  spans: {[key: string]: FBSpan},
+  spansRef: Object,
+}> {
   bindAsArray: Function;
   bindAsObject: Function;
   firebaseRefs: Object;
 
-  state : {
-    spans: {[key: string]: FBSpan},
-    spansRef: Object,
-  };
-  
   static contextTypes = {
-    userData: React.PropTypes.object,
+    userData: PropTypes.object,
   };
 
   componentWillMount() {

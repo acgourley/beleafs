@@ -2,6 +2,7 @@
 import firebase from 'firebase';
 import ReactFireMixin from 'reactfire';
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 import reactMixin from 'react-mixin'
 import './BeleafsRoot.css';
 import _ from 'lodash';
@@ -40,25 +41,22 @@ type dataOperations = {
   moveShallower: (verticeKey: string, parentVerticeKey: string) => Promise<boolean>;
 };
 
-class VerticeComponent extends Component {
+class VerticeComponent extends Component<{
+  dataOperations: dataOperations,
+  verticeKey: string,
+  parentVerticeKey: ?string,
+  verticesRef: Object,
+  editMode: ?boolean,
+  hasSiblingAbove: boolean,
+  hasSiblingBelow: boolean,
+}, {
+  vertice: FBVertice;
+  childrenKeys: Array<{'.key': string, '.value': string}>;
+}> {
   /* Flow Types (top ones for ReactFireMixin) */
   bindAsArray: Function;
   bindAsObject: Function;
   firebaseRefs: Object;
-  props: {
-    dataOperations: dataOperations,
-    verticeKey: string,
-    parentVerticeKey: ?string,
-    verticesRef: Object,
-    editMode: ?boolean,
-    hasSiblingAbove: boolean,
-    hasSiblingBelow: boolean,
-  };
-
-  state: {
-    vertice: FBVertice;
-    childrenKeys: Array<{'.key': string, '.value': string}>;
-  };
 
   constructor(props) {
     super();
@@ -67,7 +65,7 @@ class VerticeComponent extends Component {
       childrenKeys: [],
     }
   }
-  
+
   componentWillMount() {
     this.bindAsObject(this.props.verticesRef.child(this.props.verticeKey), 'vertice');
     this.bindAsArray(this.props.verticesRef.child(this.props.verticeKey).child('childrenKeys'), 'childrenKeys');
@@ -182,21 +180,17 @@ class VerticeComponent extends Component {
 }
 reactMixin(VerticeComponent.prototype, ReactFireMixin)
 
-class SpanComponent extends Component {
-
+class SpanComponent extends Component<{
+  dataOperations: dataOperations,
+  spanRef: Object,
+  editMode: ?boolean,
+}, {
+  span: FBSpan,
+}> {
   /* Flow Types (top ones for ReactFireMixin) */
   bindAsArray: Function;
   bindAsObject: Function;
   firebaseRefs: Object;
-  props: {
-    dataOperations: dataOperations,
-    spanRef: Object,
-    editMode: ?boolean,
-  };
-
-  state: {
-    span: FBSpan,
-  };
 
   constructor(props) {
     super();
@@ -240,27 +234,23 @@ class SpanComponent extends Component {
 reactMixin(SpanComponent.prototype, ReactFireMixin)
 
 
-class BeleafsRoot extends Component {
-
+class BeleafsRoot extends Component<{
+  params: {
+    spanKey: string,
+    editMode: ?string,
+  }
+}, {
+  span: ?FBSpan,
+  spanRef: ?Object,
+}> {
   /* Flow Types (top ones for ReactFireMixin) */
   bindAsArray: Function;
   bindAsObject: Function;
   firebaseRefs: Object;
   dataOperations: dataOperations;
 
-  props: {
-    params: {
-      spanKey: string,
-      editMode: ?string,
-    }
-  };
-  state: {
-    span: ?FBSpan,
-    spanRef: ?Object,
-  };
-
   static contextTypes = {
-    userData: React.PropTypes.object,
+    userData: PropTypes.object,
   };
 
   constructor() {

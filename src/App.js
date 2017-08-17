@@ -2,25 +2,24 @@
 import firebase from 'firebase'
 import ReactFireMixin from 'reactfire'
 import React, { Component } from 'react'
+import PropTypes from 'prop-types';
 import reactMixin from 'react-mixin'
-import _ from 'lodash';
+//import _ from 'lodash';
 import './App.css';
 import telescopeIcon from './assets/telescope1.svg'
 import helmetIcon from './assets/helmet1.svg'
 import githubIcon from './assets/github.svg'
 import { Link } from 'react-router'
 
-class App extends Component {
+class App extends Component<$FlowFixMeProps, {
+  userData: ?Object,
+}> {
   bindAsArray: Function;
   bindAsObject: Function;
   firebaseRefs: Object;
 
-  state : {
-    userData: ?Object,
-  };
-  
   static childContextTypes = {
-    userData: React.PropTypes.object,
+    userData: PropTypes.object,
   };
 
   constructor(){
