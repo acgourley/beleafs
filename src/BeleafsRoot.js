@@ -377,8 +377,8 @@ class BeleafsRoot extends Component {
               }
             }).then(()=>true);
           } else {
-            if(!groundwardsBrotherSnap) console.log('moveBottomwards failed to find a eligable groundwards sibling to switch with!');
-            if(!targetSiblingSnap) console.log('moveBottomwards failed to find a target vertice!');
+            if(!groundwardsBrotherSnap) console.log('moveDeeper failed to find a eligable groundwards sibling to switch with!');
+            if(!targetSiblingSnap) console.log('moveDeeper failed to find a target vertice!');
           }
           return false;
 
@@ -388,12 +388,13 @@ class BeleafsRoot extends Component {
         return spanVerticesRef.transaction((vertices) => {
           var foundOldParentChildKey;
           var newParentChildKey;
-          _.each(vertices[parentVerticeKey].childrenKeys, (verticeChildVal, verticeChildKey) => {
-            if(verticeChildVal === targetVerticeKey){
-              foundOldParentChildKey = verticeChildKey
-              vertices[parentVerticeKey].childrenKeys[foundOldParentChildKey] = null; //erase it
-            }
-          })
+          if(vertices[parentVerticeKey].childrenKeys)
+            _.each(vertices[parentVerticeKey].childrenKeys, (verticeChildVal, verticeChildKey) => {
+              if(verticeChildVal === targetVerticeKey){
+                foundOldParentChildKey = verticeChildKey
+                vertices[parentVerticeKey].childrenKeys[foundOldParentChildKey] = null; //erase it
+              }
+            })
           _.each(vertices, ((verticeVal, verticeKey) => {
             if(verticeVal.childrenKeys)
               _.each(verticeVal.childrenKeys, (verticeChildVal, verticeChildKey) => {
@@ -405,6 +406,10 @@ class BeleafsRoot extends Component {
           }))
           if(foundOldParentChildKey && newParentChildKey)
             return vertices;
+          else {
+            if(!foundOldParentChildKey) console.log('moveShallower failed to find a eligable old parent');
+            if(!newParentChildKey) console.log('moveShallower failed to find a target new parent');
+          }
         })
       },
     }

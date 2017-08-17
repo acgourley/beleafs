@@ -53,9 +53,9 @@
               },
               "childrenKeys": {
                 "$child_key_id": {
-                  ".validate" : "newData.isString() && data.parent().parent().parent().hasChild(newData.val())"
+                  ".validate": "newData.isString() && (true || newData.parent().parent().hasChild(newData.val()))"
                 }
-              }
+              },
             }
           }
         }
